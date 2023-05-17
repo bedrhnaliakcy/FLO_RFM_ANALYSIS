@@ -35,3 +35,7 @@ plt.hist(df_copy["last_order_channel"])
 plt.xlabel("toplam alışver")
 plt.ylabel("toplam tutar")
 plt.scatter(df_copy["total_shopping"], df_copy["total_price"])
+
+df_copy.groupby(by="order_channel").agg(ToplamMusteri=("master_id", "count"),
+                                        ToplamAlınanUrun=(["order_num_total_ever_online","order_num_total_ever_offline"],"sum"),
+                                        ToplamHarcama=(["customer_value_total_ever_offline","customer_value_total_ever_offline"], "sum"))
