@@ -58,7 +58,6 @@ def visual(df,*columns):
         plt.boxplot(df[i])
         plt.title(columns)
         plt.show()
-        plt.close(fig=True)
 
 #-----------------------------------------------------
 
@@ -102,7 +101,7 @@ def rfm_analysis(data):
         r'[1-2][3-4]': 'Sleepers',
         r'[1-2][1-2]': 'Lose',
     }
-
+    # RF_Score değişkinene göre regex yapısına uygun segmetlerin oluluşturulması
     rfm['Segment'] = rfm['RF_Score'].replace(segment_mapping,regex=True)
 
     return rfm
@@ -124,4 +123,14 @@ rfm_non_outliers = remove_outliers(rfm, "Recency", "Frequency", "Monetary")
 print("\n\nRFM İstatistikleri:\n", rfm.describe())
 print("\n\nRFM İstatistikleri: \t\t(aykırı değerler silindi)\n", rfm_non_outliers.describe())
 
-target_segment = rfm[(rfm['RF_SCORE'] >= 9) & (rfm['monetary_score'] >= 4)]
+# hedef segmentleri seçmekte tip hatası sonu verirse skorların kategorik olmasıdır.
+"""
+    ----bunu çalıştırarak sorun ortadan kalkar
+rfm["recency_score"] = rfm["recency_score"].astype("float64")
+rfm["frequency_score"] = rfm["frequency_score"].astype("float64")
+rfm["monetary_score"] = rfm["monetary_score"].astype("float64")
+"""
+
+target_segment = rfm[((rfm['frequency_score'] * rfm['monetary_score']) / 2 >= 4) & (rfm['recency_score'] >= 3)]
+
+
