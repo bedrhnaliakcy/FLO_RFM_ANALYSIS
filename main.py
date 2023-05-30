@@ -126,11 +126,22 @@ print("\n\nRFM İstatistikleri: \t\t(aykırı değerler silindi)\n", rfm_non_out
 # hedef segmentleri seçmekte tip hatası sonu verirse skorların kategorik olmasıdır.
 """
     ----bunu çalıştırarak sorun ortadan kalkar
-rfm["recency_score"] = rfm["recency_score"].astype("float64")
-rfm["frequency_score"] = rfm["frequency_score"].astype("float64")
-rfm["monetary_score"] = rfm["monetary_score"].astype("float64")
+    rfm["recency_score"] = rfm["recency_score"].astype("float64")
+    rfm["frequency_score"] = rfm["frequency_score"].astype("float64")
+    rfm["monetary_score"] = rfm["monetary_score"].astype("float64")
 """
 
-target_segment = rfm[((rfm['frequency_score'] * rfm['monetary_score']) / 2 >= 4) & (rfm['recency_score'] >= 3)]
+# hedef müşteri          -segment  -içinde    [           fm_skoru 4'ten büyük olanlar         ]      ve     [ r_skoru 3'ten büyük ] olan [ müşteri numaraları ]
+target_segment = rfm[rfm["Segment"].isin(["Champions","Loyal Customers"])]["customer_id"]
+
+#    -müşteriler    -içinden (target_segment) değişkenine   ve        kadın müşterilerine uygun [müşteri numaralarını] al
+target_segment = df_copy[df_copy["master_id"].isin(target_segment) & df_copy["interested_in_categories_12"].str.contains("KADIN")]["master_id"]
+
+target_segment.to_csv("yeni_ürün_hedef_kitlesi.csv")
 
 
+
+
+target_segment = rfm[rfm["Segment"].isin(["New Customers","Shouldn^t Lose", "Sleepers"])]["customer_id"]
+target_segment = df_copy[df_copy["master_id"].isin(target_segment) & ((df_copy["interested_in_categories_12"].str.contains("ERKEK")) | (df_copy["interested_in_categories_12"].str.contains("COCUK")))]["master_id"]
+target_segment.to_csv("yeni_ürün_hedef_kitlesi_ekek-cocuk.csv")
