@@ -83,27 +83,27 @@ def rfm_analysis(data):
     rfm['monetary_score'] = pd.qcut(rfm['Monetary'], q=5, labels=[5, 4, 3, 2, 1], duplicates='drop')
 
     # RFM skoru oluşturma
-    rfm['RFM_Score'] = rfm['Recency'].astype(str) + rfm['Frequency'].astype(str) + rfm['Monetary'].astype(str)
+    rfm['RFM_Score'] = rfm['recency_score'].astype(str) + rfm['frequency_score'].astype(str) + rfm['monetary_score'].astype(str)
 
     #RF skoru oluşturma
-    rfm['RF_Score'] = rfm['Recency'].astype(str) + rfm['Frequency'].astype(str)
+    rfm['RF_Score'] = rfm['recency_score'].astype(str) + rfm['frequency_score'].astype(str)
 
     # RFM segmentlerini tanımlama
     segment_mapping = {
-        '1': 'Champions',
-        '2': 'Loyal Customers',
-        '3': 'Promising',
-        '4': 'New Customers',
-        '5': 'Abandoned Checkouts',
-        '6': 'Warm Leads',
-        '7': 'Cold Leads',
-        '8': 'Need Attention',
-        '9': 'Shouldn^t Lose',
-        '10': 'Sleepers',
-        '11': 'Lose',
+        r'[5][5]': 'Champions',
+        r'[3-4-5][4-5]': 'Loyal Customers',
+        r'[4-5][2-3]': 'Promising',
+        r'[5][1]': 'New Customers',
+        r'[5][0-1]': 'Abandoned Checkouts',
+        r'[4][1]': 'Warm Leads',
+        r'[3][1]': 'Cold Leads',
+        r'[2-3][2-3]': 'Need Attention',
+        r'[1-2][5]': 'Shouldn^t Lose',
+        r'[1-2][3-4]': 'Sleepers',
+        r'[1-2][1-2]': 'Lose',
     }
 
-    rfm['Segment'] = rfm['RF_Score'].map(segment_mapping)
+    rfm['Segment'] = rfm['RF_Score'].replace(segment_mapping,regex=True)
 
     return rfm
 #----------------------------------------------------- todo aykırı değerleri tespiti
@@ -123,3 +123,5 @@ rfm_non_outliers = remove_outliers(rfm, "Recency", "Frequency", "Monetary")
 
 print("\n\nRFM İstatistikleri:\n", rfm.describe())
 print("\n\nRFM İstatistikleri: \t\t(aykırı değerler silindi)\n", rfm_non_outliers.describe())
+
+target_segment = rfm[(rfm['RF_SCORE'] >= 9) & (rfm['monetary_score'] >= 4)]
